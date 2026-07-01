@@ -372,6 +372,13 @@ input[type=number].qty-input {
   max-width: 600px;
 }
 
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
 .admin-tabs {
   display: flex;
   gap: 0;

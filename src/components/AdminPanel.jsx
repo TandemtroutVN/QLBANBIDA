@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { formatCurrency } from '../utils/format';
 import { TABLE_TYPES } from '../data/defaults';
 
@@ -6,6 +6,36 @@ export default function AdminPanel({ tables, menu, onUpdateTables, onUpdateMenu,
   const [activeTab, setActiveTab] = useState('tables');
   const [editingTable, setEditingTable] = useState(null);
   const [editingMenu, setEditingMenu] = useState(null);
+  const fileRef = useRef(null);
+
+  const handleExport = () => {
+    const data = { tables, menu };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `qlbida_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.tables) onUpdateTables(data.tables);
+        if (data.menu) onUpdateMenu(data.menu);
+        alert('Nhập dữ liệu thành công!');
+      } catch {
+        alert('File JSON không hợp lệ.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   const handleSaveTable = (table) => {
     if (table.id) {
@@ -49,6 +79,11 @@ export default function AdminPanel({ tables, menu, onUpdateTables, onUpdateMenu,
           <button className="btn btn-close" onClick={onClose}>&times;</button>
         </div>
         <div className="modal-body">
+          <div className="admin-actions">
+            <input type="file" accept=".json" ref={fileRef} onChange={handleImport} style={{ display: 'none' }} />
+            <button className="btn btn-sm btn-secondary" onClick={() => fileRef.current.click()}>📥 Nhập</button>
+            <button className="btn btn-sm btn-secondary" onClick={handleExport}>📤 Xuất</button>
+          </div>
           <div className="admin-tabs">
             <button className={`tab ${activeTab === 'tables' ? 'active' : ''}`} onClick={() => setActiveTab('tables')}>Bàn</button>
             <button className={`tab ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>Thực đơn</button>
