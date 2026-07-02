@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSyncData from './hooks/useSyncData';
+import { syncServerTime, getServerNow } from './utils/time';
 import TableCard from './components/TableCard';
 import TableModal from './components/TableModal';
 import BillModal from './components/BillModal';
@@ -13,8 +14,10 @@ export default function App() {
 
   const getTable = (id) => tables.find(t => t.id === id);
 
+  useEffect(() => { syncServerTime(); }, []);
+
   const handleStart = (id) => {
-    const now = new Date().toISOString();
+    const now = getServerNow().toISOString();
     const table = getTable(id);
     upsertTable({ ...table, occupied: true, startTime: now, items: [] });
     setTables(tables.map(t =>

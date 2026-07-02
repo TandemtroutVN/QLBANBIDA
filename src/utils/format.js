@@ -1,3 +1,5 @@
+import { getServerNow } from './time';
+
 export function formatCurrency(amount) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
@@ -18,7 +20,7 @@ export function formatDate(date) {
 export function calculateHours(startTime) {
   if (!startTime) return 0;
   const start = new Date(startTime);
-  const now = new Date();
+  const now = getServerNow();
   const diffMs = now - start;
   const diffHours = diffMs / (1000 * 60 * 60);
   return diffHours;
