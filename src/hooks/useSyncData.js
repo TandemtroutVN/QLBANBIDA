@@ -3,6 +3,9 @@ import { supabase } from '../supabase/client';
 import { fetchTables, upsertTable, deleteTable, fetchMenu, upsertMenuItem, deleteMenuItem } from '../supabase/api';
 import { DEFAULT_TABLES, DEFAULT_MENU } from '../data/defaults';
 
+const TABLES_STORAGE_KEY = 'qlbida_tables_v2';
+const MENU_STORAGE_KEY = 'qlbida_menu_v2';
+
 function loadLocal(key, fallback) {
   try {
     const stored = localStorage.getItem(key);
@@ -15,19 +18,19 @@ function saveLocal(key, data) {
 }
 
 export default function useSyncData() {
-  const [tables, setTables] = useState(() => loadLocal('qlbida_tables', DEFAULT_TABLES));
-  const [menu, setMenu] = useState(() => loadLocal('qlbida_menu', DEFAULT_MENU));
+  const [tables, setTables] = useState(() => loadLocal(TABLES_STORAGE_KEY, DEFAULT_TABLES));
+  const [menu, setMenu] = useState(() => loadLocal(MENU_STORAGE_KEY, DEFAULT_MENU));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
   const channelRef = useRef(null);
 
   useEffect(() => {
-    saveLocal('qlbida_tables', tables);
+    saveLocal(TABLES_STORAGE_KEY, tables);
   }, [tables]);
 
   useEffect(() => {
-    saveLocal('qlbida_menu', menu);
+    saveLocal(MENU_STORAGE_KEY, menu);
   }, [menu]);
 
   useEffect(() => {
@@ -69,18 +72,6 @@ export default function useSyncData() {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  useEffect(() => {
-    if (!connected) return;
-    const id = setInterval(async () => {
-      try {
-        const [t, m] = await Promise.all([fetchTables(), fetchMenu()]);
-        if (t) setTables(t);
-        if (m) setMenu(m);
-      } catch {}
-    }, 1000);
-    return () => clearInterval(id);
-  }, [connected]);
 
   async function initData() {
     try {

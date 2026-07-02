@@ -8,7 +8,7 @@ export default function TableModal({ table, menu, onClose, onUpdateItems, onEndS
 
   useEffect(() => {
     setItems(table.items ? [...table.items] : []);
-  }, [table]);
+  }, [table.id]);
 
   useEffect(() => {
     if (!table.occupied) return;
