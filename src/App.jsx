@@ -11,10 +11,13 @@ export default function App() {
   const { tables, menu, loading, error, connected, setTables, setMenu, upsertTable, deleteTable, upsertMenu, deleteMenu } = useSyncData();
   const [activeModal, setActiveModal] = useState(null);
   const [billTable, setBillTable] = useState(null);
+  const [timeSynced, setTimeSynced] = useState(false);
 
   const getTable = (id) => tables.find(t => t.id === id);
 
-  useEffect(() => { syncServerTime(); }, []);
+  useEffect(() => {
+    syncServerTime().finally(() => setTimeSynced(true));
+  }, []);
 
   const handleStart = (id) => {
     const now = getServerNow().toISOString();
@@ -55,10 +58,10 @@ export default function App() {
     setBillTable(id);
   };
 
-  if (loading) {
+  if (loading || !timeSynced) {
     return (
       <div className="app">
-        <div className="loading">Đang tải dữ liệu...</div>
+        <div className="loading">{!timeSynced ? 'Đang đồng bộ giờ...' : 'Đang tải dữ liệu...'}</div>
       </div>
     );
   }

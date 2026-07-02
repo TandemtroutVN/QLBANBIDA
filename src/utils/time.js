@@ -1,12 +1,16 @@
+import { supabase } from '../supabase/client';
+
 let serverOffset = 0;
 
 export async function syncServerTime() {
   try {
-    const res = await fetch('https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh');
-    const data = await res.json();
-    serverOffset = data.unixtime * 1000 - Date.now();
+    const { data, error } = await supabase.rpc('get_server_time');
+    if (error) throw error;
+    serverOffset = new Date(data).getTime() - Date.now();
   } catch {
-    serverOffset = 0;
+    const res = await fetch('https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh');
+    const d = await res.json();
+    serverOffset = d.unixtime * 1000 - Date.now();
   }
 }
 

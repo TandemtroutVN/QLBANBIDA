@@ -28,3 +28,6 @@ alter table public.menu_items enable row level security;
 
 create policy "Allow all" on public.menu_items
   for all using (true) with check (true);
+
+create or replace function get_server_time()
+returns timestamptz as $$ select now(); $$ language sql;
