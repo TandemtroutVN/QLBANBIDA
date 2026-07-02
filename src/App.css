@@ -1,13 +1,40 @@
+@font-face {
+  font-family: 'Noto Sans VN';
+  src: url('./assets/fonts/NotoSansVN-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans VN';
+  src: url('./assets/fonts/NotoSansVN-Bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+:root {
+  font-family: 'Noto Sans VN', 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: inherit;
   background: #f0f2f5;
   color: #333;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 .app {

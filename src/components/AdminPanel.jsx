@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { formatCurrency } from '../utils/format';
 import { TABLE_TYPES } from '../data/defaults';
+import { repairSyncedMenu, repairSyncedTables } from '../utils/repairVietnamese';
 
 export default function AdminPanel({ tables, menu, onUpdateTables, onUpdateMenu, onClose }) {
   const [activeTab, setActiveTab] = useState('tables');
@@ -26,14 +27,14 @@ export default function AdminPanel({ tables, menu, onUpdateTables, onUpdateMenu,
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target.result);
-        if (data.tables) onUpdateTables(data.tables);
-        if (data.menu) onUpdateMenu(data.menu);
+        if (data.tables) onUpdateTables(repairSyncedTables(data.tables));
+        if (data.menu) onUpdateMenu(repairSyncedMenu(data.menu));
         alert('Nhập dữ liệu thành công!');
       } catch {
         alert('File JSON không hợp lệ.');
       }
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'utf-8');
     e.target.value = '';
   };
 
