@@ -24,6 +24,15 @@ export function calculateHours(startTime) {
   return diffHours;
 }
 
+export function formatElapsed(startTime) {
+  if (!startTime) return '';
+  const h = calculateHours(startTime);
+  const hrs = Math.floor(h);
+  const mins = Math.floor((h - hrs) * 60);
+  const secs = Math.floor(((h - hrs) * 60 - mins) * 60);
+  return `${hrs}h${mins.toString().padStart(2, '0')}m${secs.toString().padStart(2, '0')}s`;
+}
+
 export function calculateTableCost(hours, hourlyRate) {
   return hours * hourlyRate;
 }

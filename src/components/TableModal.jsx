@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import MenuPanel from './MenuPanel';
-import { formatCurrency, calculateHours, formatTime, roundTotal } from '../utils/format';
+import { formatCurrency, calculateHours, formatTime, formatElapsed, roundTotal } from '../utils/format';
 
 export default function TableModal({ table, menu, onClose, onUpdateItems, onEndSession }) {
   const [items, setItems] = useState([]);
@@ -70,7 +70,7 @@ export default function TableModal({ table, menu, onClose, onUpdateItems, onEndS
           {table.occupied && (
             <div className="session-info">
               <p>Bắt đầu: {formatTime(table.startTime)}</p>
-              <p>Đã chơi: {hours.toFixed(1)} giờ</p>
+              <p className="elapsed-time">{formatElapsed(table.startTime)}</p>
               <p>Tiền bàn: {formatCurrency(tableCost)}</p>
             </div>
           )}

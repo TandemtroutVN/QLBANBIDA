@@ -70,6 +70,18 @@ export default function useSyncData() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!connected) return;
+    const id = setInterval(async () => {
+      try {
+        const [t, m] = await Promise.all([fetchTables(), fetchMenu()]);
+        if (t) setTables(t);
+        if (m) setMenu(m);
+      } catch {}
+    }, 1000);
+    return () => clearInterval(id);
+  }, [connected]);
+
   async function initData() {
     try {
       const [t, m] = await Promise.all([fetchTables(), fetchMenu()]);

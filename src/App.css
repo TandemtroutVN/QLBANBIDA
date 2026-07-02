@@ -96,6 +96,14 @@ body {
   color: #ef4444;
 }
 
+.elapsed-time {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ef4444;
+  text-align: center;
+  padding: 4px 0;
+}
+
 .start-time {
   font-size: 12px;
   color: #888;

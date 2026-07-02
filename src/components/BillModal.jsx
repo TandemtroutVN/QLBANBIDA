@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { formatCurrency, calculateHours, formatTime, roundTotal } from '../utils/format';
+import { formatCurrency, calculateHours, formatTime, formatElapsed, roundTotal } from '../utils/format';
 
 export default function BillModal({ table, menu, items, onClose, onConfirm }) {
   const [now, setNow] = useState(Date.now());
@@ -35,7 +35,7 @@ export default function BillModal({ table, menu, items, onClose, onConfirm }) {
           <div className="bill-table-info">
             <h3>{table.name} - {table.type}</h3>
             <p>Giờ bắt đầu: {formatTime(table.startTime)}</p>
-            <p>Thời gian chơi: {hours.toFixed(1)} giờ</p>
+            <p>Thời gian chơi: {formatElapsed(table.startTime)} ({hours.toFixed(1)} giờ)</p>
           </div>
 
           <div className="bill-section">

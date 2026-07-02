@@ -10,7 +10,8 @@ export default function TableCard({ table, onStart, onManage, onBill }) {
       const h = calculateHours(table.startTime);
       const hrs = Math.floor(h);
       const mins = Math.floor((h - hrs) * 60);
-      setElapsed(`${hrs}h${mins.toString().padStart(2, '0')}m`);
+      const secs = Math.floor(((h - hrs) * 60 - mins) * 60);
+      setElapsed(`${hrs}h${mins.toString().padStart(2, '0')}m${secs.toString().padStart(2, '0')}s`);
     };
     tick();
     const id = setInterval(tick, 1000);
