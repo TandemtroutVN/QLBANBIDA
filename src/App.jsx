@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useLocalStorage } from './hooks/useLocalStorage';
-import { DEFAULT_TABLES, DEFAULT_MENU } from './data/defaults';
+import useSyncData from './hooks/useSyncData';
 import TableCard from './components/TableCard';
 import TableModal from './components/TableModal';
 import BillModal from './components/BillModal';
@@ -8,16 +7,18 @@ import AdminPanel from './components/AdminPanel';
 import './App.css';
 
 export default function App() {
-  const [tables, setTables] = useLocalStorage('qlbida_tables', DEFAULT_TABLES);
-  const [menu, setMenu] = useLocalStorage('qlbida_menu', DEFAULT_MENU);
+  const { tables, menu, loading, error, connected, setTables, setMenu, upsertTable, deleteTable, upsertMenu, deleteMenu } = useSyncData();
   const [activeModal, setActiveModal] = useState(null);
   const [billTable, setBillTable] = useState(null);
 
   const getTable = (id) => tables.find(t => t.id === id);
 
   const handleStart = (id) => {
+    const now = new Date().toISOString();
+    const table = getTable(id);
+    upsertTable({ ...table, occupied: true, startTime: now, items: [] });
     setTables(tables.map(t =>
-      t.id === id ? { ...t, occupied: true, startTime: new Date().toISOString(), items: [] } : t
+      t.id === id ? { ...t, occupied: true, startTime: now, items: [] } : t
     ));
   };
 
@@ -26,6 +27,8 @@ export default function App() {
   };
 
   const handleUpdateItems = (id, items) => {
+    const table = getTable(id);
+    upsertTable({ ...table, items });
     setTables(tables.map(t =>
       t.id === id ? { ...t, items: items.filter(i => i.quantity > 0) } : t
     ));
@@ -36,6 +39,8 @@ export default function App() {
   };
 
   const handleConfirmPayment = (id) => {
+    const table = getTable(id);
+    upsertTable({ ...table, occupied: false, startTime: null, items: [] });
     setTables(tables.map(t =>
       t.id === id ? { ...t, occupied: false, startTime: null, items: [] } : t
     ));
@@ -47,11 +52,29 @@ export default function App() {
     setBillTable(id);
   };
 
+  if (loading) {
+    return (
+      <div className="app">
+        <div className="loading">Đang tải dữ liệu...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="app">
+        <div className="error">Lỗi: {error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="header">
         <h1>Quản lý bàn Bida</h1>
         <div className="header-actions">
+          {!connected && <span className="badge badge-warning">Offline</span>}
+          {connected && <span className="badge badge-success">Online</span>}
           <button className="btn btn-secondary" onClick={() => setActiveModal('admin')}>
             ⚙ Quản lý
           </button>
@@ -96,8 +119,18 @@ export default function App() {
         <AdminPanel
           tables={tables}
           menu={menu}
-          onUpdateTables={setTables}
-          onUpdateMenu={setMenu}
+          onUpdateTables={(updated) => {
+            const deleted = tables.filter(t => !updated.find(u => u.id === t.id));
+            deleted.forEach(t => deleteTable(t.id));
+            updated.forEach(t => upsertTable(t));
+            setTables(updated);
+          }}
+          onUpdateMenu={(updated) => {
+            const deleted = menu.filter(m => !updated.find(u => u.id === m.id));
+            deleted.forEach(m => deleteMenu(m.id));
+            updated.forEach(m => upsertMenu(m));
+            setMenu(updated);
+          }}
           onClose={() => setActiveModal(null)}
         />
       )}
